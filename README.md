@@ -10,10 +10,9 @@ Click Models for Web Search.
 Morgan & Claypool Publishers, 2015.
 http://clickmodels.weebly.com/the-book.html
 
-In addition to the Click Models for Web Search book, we have added the **iLab Click and Conversion Dynamic Bayesian Network (iCCDBN)** model developed at iLab to this repository.
-(A reference to the accompanying paper will be added once it is published.)
 ```
-        
+In addition to the Click Models for Web Search book, we have added the iLab Click and Conversion Dynamic Bayesian Network (iCCDBN) model developed at iLab to this repository.
+(A reference to the accompanying paper will be added once it is published.)   
 
 # How to Use
 
