@@ -1,19 +1,21 @@
-#
+# 
 # Copyright (C) 2015  Ilya Markov
+#
+# Copyright (C) 2025  Afra Arslan, Hacer Turgut
 #
 # Full copyright notice can be found in LICENSE.
 #
+import json
 from abc import abstractmethod
 from collections import defaultdict
-import json
 
-__author__ = 'Ilya Markov'
+__author__ = 'Ilya Markov, Hacer Turgut, Afra Arslan'
 
 
 class ParamContainer(object):
     """An abstract container of parameters of a click model."""
 
-    def __init__(self, param_class, *args):
+    def __init__(self, param_class, *args, **kwargs):
         """
         Initializes the container.
 
@@ -23,6 +25,7 @@ class ParamContainer(object):
         self._container = None
         self._param_class = param_class
         self._param_args = args
+        self._param_kwargs = kwargs
 
     def size(self):
         """
@@ -160,7 +163,6 @@ class QueryDocumentParamContainer(ParamContainer):
         for query in self._container:
             if counter > self.PARAMS_PRINT_MAX >= 0:
                 break
-            #TODO: convert defaultdict into dict
             param_str += '%s: %r\n' % (query, dict(self._container[query]))
             counter += len(self._container[query])
         return param_str
@@ -189,7 +191,7 @@ class QueryDocumentParamContainer(ParamContainer):
 class RankParamContainer(ParamContainer):
     """A container of click model parameters that depend on rank."""
 
-    MAX_RANK_DEFAULT = 10
+    MAX_RANK_DEFAULT = 100
     """The default maximum rank."""
 
     def __init__(self, param_class, max_rank, *args):
@@ -263,7 +265,7 @@ class RankPrevClickParamContainer(ParamContainer):
     and on the rank of the previously clicked result (see, e.g., UBM).
     """
 
-    MAX_RANK_DEFAULT = 10
+    MAX_RANK_DEFAULT = 100
     """The default maximum rank."""
 
     def __init__(self, param_class, max_rank, *args):
@@ -369,9 +371,9 @@ class SingleParamContainer(ParamContainer):
     e.g., continuation probability in the DBN model.
     """
 
-    def __init__(self, param_class, *args):
-        super(SingleParamContainer, self).__init__(param_class, *args)
-        self._container = self._param_class(*self._param_args)
+    def __init__(self, param_class, *args, **kwargs):
+        super(SingleParamContainer, self).__init__(param_class, *args, **kwargs)
+        self._container = self._param_class(*self._param_args, **self._param_kwargs)
 
     def size(self):
         return 1

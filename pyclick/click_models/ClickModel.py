@@ -3,8 +3,8 @@
 #
 # Full copyright notice can be found in LICENSE.
 #
-from abc import abstractmethod
 import json
+from abc import abstractmethod
 from enum import Enum
 
 __author__ = 'Ilya Markov'
@@ -25,7 +25,7 @@ class ClickModel(object):
 
     def train(self, search_sessions):
         """Trains the click model using the given list of search sessions."""
-        self._inference.infer_params(self, search_sessions)
+        return self._inference.infer_params(self, search_sessions)
 
     def to_json(self):
         """
