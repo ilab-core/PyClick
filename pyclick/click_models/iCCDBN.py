@@ -12,13 +12,13 @@ from pyclick.click_models.ParamContainer import (QueryDocumentParamContainer,
                                                  SingleParamContainer)
 
 
-class IDBN(ClickModel):
+class iCCDBN(ClickModel):
     """
     """
 
-    param_names = Enum('IDBNParamNames', 'attr sat_click sat_pur pur cont exam car par')
+    param_names = Enum('iCCDBNParamNames', 'attr sat_click sat_pur pur cont exam car par')
     """
-    The names of the IDBN parameters.
+    The names of the iCCDBN parameters.
 
     :attr: the attractiveness parameter.
     Determines whether a user clicks on a search results after examining it.
@@ -34,27 +34,27 @@ class IDBN(ClickModel):
     Determines whether a user continues examining search results after examining the current one.
 
     :exam: the examination probability.
-    Not defined explicitly in the IDBN model, but needs to be calculated during inference.
+    Not defined explicitly in the iCCDBN model, but needs to be calculated during inference.
     Determines whether a user examines a particular search result.
     :car: the probability of click on or after rank $r$ given examination at rank $r$.
-    Not defined explicitly in the IDBN model, but needs to be calculated during inference.
+    Not defined explicitly in the iCCDBN model, but needs to be calculated during inference.
     Determines whether a user clicks on the current result or any result below the current one.
     :par: the probability of purchase on or after rank $r$ given examination at rank $r$.
-    Not defined explicitly in the IDBN model, but needs to be calculated during inference.
+    Not defined explicitly in the iCCDBN model, but needs to be calculated during inference.
     Determines whether a user purchase on the current result or any result below the current one.
     """
 
     def __init__(self, inference=EMInference(), cont_static=0.95):
-        self.params = {self.param_names.attr: QueryDocumentParamContainer(IDBNAttrEM),  # self._container[query][search_result]
-                       self.param_names.sat_click: QueryDocumentParamContainer(IDBNSatClickEM),
-                       self.param_names.sat_pur: QueryDocumentParamContainer(IDBNSatPurEM),
-                       self.param_names.pur: QueryDocumentParamContainer(IDBNPurMLE),
-                       self.param_names.cont: SingleParamContainer(IDBNContEM, static=cont_static)}
+        self.params = {self.param_names.attr: QueryDocumentParamContainer(iCCDBNAttrEM),  # self._container[query][search_result]
+                       self.param_names.sat_click: QueryDocumentParamContainer(iCCDBNSatClickEM),
+                       self.param_names.sat_pur: QueryDocumentParamContainer(iCCDBNSatPurEM),
+                       self.param_names.pur: QueryDocumentParamContainer(iCCDBNPurMLE),
+                       self.param_names.cont: SingleParamContainer(iCCDBNContEM, static=cont_static)}
 
         self._inference = inference
 
     def get_session_params(self, search_session):
-        session_params = super(IDBN, self).get_session_params(search_session)
+        session_params = super(iCCDBN, self).get_session_params(search_session)
 
         session_exam = self._get_session_exam(search_session, session_params)
         session_clickafterrank = self._get_session_clickafterrank(search_session, session_params)
@@ -327,9 +327,9 @@ class IDBN(ClickModel):
         return session_purchaseafterrank
 
 
-class IDBNAttrEM(ParamEM):
+class iCCDBNAttrEM(ParamEM):
     """
-    The attractiveness parameter of the IDBN model.
+    The attractiveness parameter of the iCCDBN model.
     The value of the parameter is inferred using the EM algorithm.
     """
 
@@ -337,9 +337,9 @@ class IDBNAttrEM(ParamEM):
         if search_session.web_results[rank].click:  # cu
             self._numerator += 1
         elif rank >= search_session.get_last_click_rank():  # (1 - cu)(1 - c>r)
-            attr = session_params[rank][IDBN.param_names.attr].value()
-            exam = session_params[rank][IDBN.param_names.exam].value()
-            car = session_params[rank][IDBN.param_names.car].value()
+            attr = session_params[rank][iCCDBN.param_names.attr].value()
+            exam = session_params[rank][iCCDBN.param_names.exam].value()
+            car = session_params[rank][iCCDBN.param_names.car].value()
 
             num = (1 - exam) * attr
             denom = 1 - exam * car
@@ -348,18 +348,18 @@ class IDBNAttrEM(ParamEM):
         self._denominator += 1
 
 
-class IDBNSatClickEM(ParamEM):
+class iCCDBNSatClickEM(ParamEM):
     """
-    The satisfactoriness parameter of the IDBN model without purchase.
+    The satisfactoriness parameter of the iCCDBN model without purchase.
     The value of the parameter is inferred using the EM algorithm.
     """
 
     def update(self, search_session, rank, session_params):
         if search_session.web_results[rank].click and not search_session.web_results[rank].purchase:  # S(uq)' : {cu = 1, tu = 0}
             if rank == search_session.get_last_click_rank():  # (1 - c>r)
-                sat_click = session_params[rank][IDBN.param_names.sat_click].value()
-                cont = session_params[rank][IDBN.param_names.cont].value()
-                car = session_params[rank + 1][IDBN.param_names.car].value() \
+                sat_click = session_params[rank][iCCDBN.param_names.sat_click].value()
+                cont = session_params[rank][iCCDBN.param_names.cont].value()
+                car = session_params[rank + 1][iCCDBN.param_names.car].value() \
                     if rank < len(search_session.web_results) - 1 \
                     else 0
 
@@ -368,18 +368,18 @@ class IDBNSatClickEM(ParamEM):
             self._denominator += 1
 
 
-class IDBNSatPurEM(ParamEM):
+class iCCDBNSatPurEM(ParamEM):
     """
-    The satisfactoriness parameter of the IDBN model with purchase.
+    The satisfactoriness parameter of the iCCDBN model with purchase.
     The value of the parameter is inferred using the EM algorithm.
     """
 
     def update(self, search_session, rank, session_params):  # TO-DO: KONTROL
         if search_session.web_results[rank].click and search_session.web_results[rank].purchase:  # S(uq)' : {cu = 1, tu = 1}
             if rank == search_session.get_last_click_rank():  # (1 - c>r)
-                sat_pur = session_params[rank][IDBN.param_names.sat_pur].value()
-                cont = session_params[rank][IDBN.param_names.cont].value()
-                car = session_params[rank + 1][IDBN.param_names.car].value() \
+                sat_pur = session_params[rank][iCCDBN.param_names.sat_pur].value()
+                cont = session_params[rank][iCCDBN.param_names.cont].value()
+                car = session_params[rank + 1][iCCDBN.param_names.car].value() \
                     if rank < len(search_session.web_results) - 1 \
                     else 0
 
@@ -388,9 +388,9 @@ class IDBNSatPurEM(ParamEM):
             self._denominator += 1
 
 
-class IDBNPurMLE(ParamMLE):
+class iCCDBNPurMLE(ParamMLE):
     """
-    The purchase parameter of the IDBN model.
+    The purchase parameter of the iCCDBN model.
     The value of the parameter is inferred using the MLE algorithm.
 
     """
@@ -402,9 +402,9 @@ class IDBNPurMLE(ParamMLE):
             self._denominator += 1
 
 
-class IDBNContEM(ParamEM):
+class iCCDBNContEM(ParamEM):
     """
-    The continuation (persistence) parameter of the IDBN model.
+    The continuation (persistence) parameter of the iCCDBN model.
     The value of the parameter is inferred using the EM algorithm.
     """
     def __init__(self, static):
@@ -419,8 +419,8 @@ class IDBNContEM(ParamEM):
     def update(self, search_session, rank, session_params):
         if self.static:
             return
-        factor = IDBN._get_continuation_factor(search_session, rank, session_params)
-        total_factor = IDBN._get_total_continuation_factor(search_session, rank, session_params)
+        factor = iCCDBN._get_continuation_factor(search_session, rank, session_params)
+        total_factor = iCCDBN._get_total_continuation_factor(search_session, rank, session_params)
 
         def exam_prob(z):
             return factor(1, 0, z) / total_factor  # ESS(z)
