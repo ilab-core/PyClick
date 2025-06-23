@@ -9,8 +9,10 @@ Aleksandr Chuklin, Ilya Markov, Maarten de Rijke.
 Click Models for Web Search.
 Morgan & Claypool Publishers, 2015.
 http://clickmodels.weebly.com/the-book.html
+
 ```
-        
+In addition to the Click Models for Web Search book, we have added the iLab Click and Conversion Dynamic Bayesian Network (iCCDBN) model developed at iLab to this repository.
+(A reference to the accompanying paper will be added once it is published.)   
 
 # How to Use
 
@@ -153,7 +155,7 @@ TODO
 
 * The project is partially funded by the grant P2T1P2\_152269 of the Swiss National Science Foundation.
 * Initially inspired by the [clickmodels](https://github.com/varepsilon/clickmodels) project.
-* Contributors: Ilya Markov, Aleksandr Chuklin, Artem Grotov, Luka Stout, Finde Xumara, Bart Vredebregt, Nick de Wolf.
+* Contributors: Ilya Markov, Aleksandr Chuklin, Artem Grotov, Luka Stout, Finde Xumara, Bart Vredebregt, Nick de Wolf, Afra Arslan, Hacer Turgut.
 
 
 # References
